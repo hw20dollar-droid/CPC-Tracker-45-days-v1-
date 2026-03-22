@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>CPC 45-Day Study Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@500;700;800&family=Sora:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Sora',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;-webkit-tap-highlight-color:transparent}
+button{font-family:'Sora',sans-serif;cursor:pointer;border:none;background:none;color:inherit}
+button:active{transform:scale(.96)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#475569;border-radius:2px}
+:root{--bg:#0f172a;--cd:rgba(30,41,59,.8);--tx:#e2e8f0;--sb:#94a3b8;--bd:rgba(51,65,85,.6);--ok:#10b981;--no:#dc2626;--r:16px;
+--fH:'Playfair Display',serif;--fM:'JetBrains Mono',monospace;--fU:'Sora',sans-serif;--fC:'Caveat',cursive}
+
+.app{display:flex;flex-direction:column;height:100dvh}
+.G{background:var(--cd);backdrop-filter:saturate(150%) blur(12px);-webkit-backdrop-filter:saturate(150%) blur(12px);border:1px solid var(--bd)}
+
+/* Header */
+.hdr{padding:14px 16px;color:#fff;flex-shrink:0}
+.hdr-in{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.hdr h1{font-size:17px;font-weight:900;font-family:var(--fH)}
+.hdr .sub{font-size:9px;opacity:.8;font-family:var(--fM)}
+.hdr-st{display:flex;align-items:center;gap:8px}
+.sp{text-align:center;min-width:36px}.sp .v{font-size:14px;font-weight:800;font-family:var(--fM)}.sp .l{font-size:7px;opacity:.8;text-transform:uppercase}
+.ib{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:13px}
+.pbar{max-width:800px;margin:6px auto 0;height:4px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}
+.pfill{height:100%;border-radius:4px;background:linear-gradient(90deg,#fff,#34d399);transition:width .5s}
+
+/* Nav */
+.nav{border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;flex-shrink:0}
+.nav-in{max-width:800px;margin:0 auto;display:flex}
+.nav button{flex:1;padding:10px;font-size:12px;font-weight:700;border-bottom:3px solid transparent}
+
+/* Content */
+.cnt{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.cnt-in{max-width:800px;margin:0 auto;padding:14px 14px 120px;position:relative}
+
+/* Day watermark — giant day number behind content */
+.watermark{position:fixed;bottom:-40px;right:-20px;font-size:320px;font-weight:900;font-family:var(--fH);color:rgba(255,255,255,.02);pointer-events:none;z-index:0;line-height:1;user-select:none}
+
+/* Day nav */
+.dnav{display:flex;align-items:center;gap:5px;margin-bottom:12px;position:relative;z-index:1}
+.dnav>button{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--bd);font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center}
+.ddots{flex:1;display:flex;gap:2px;justify-content:center;flex-wrap:wrap}
+.wdots{display:flex;gap:1.5px}
+.dot{width:9px;height:9px;border-radius:2px;cursor:pointer;transition:.25s}
+.dot:hover{transform:scale(1.3)}.dot.cur{width:14px;height:14px;border-radius:4px}
+.dot.dn{background:var(--ok)!important;box-shadow:0 0 6px rgba(16,185,129,.3)}
+
+/* Hero with background image */
+.hero{position:relative;border-radius:var(--r);overflow:hidden;margin-bottom:12px;height:150px;background-size:cover;background-position:center;z-index:1}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.7))}
+.hero-wm{position:absolute;top:50%;right:20px;transform:translateY(-50%);font-size:120px;font-weight:900;font-family:var(--fH);color:rgba(255,255,255,.08);line-height:1;z-index:0}
+.hero-ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 16px;color:#fff;z-index:1}
+.hero-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;font-family:var(--fM);color:#fbbf24}
+.hero-ti{font-size:22px;font-weight:900;line-height:1.1;margin-top:3px;font-family:var(--fH);text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.hero-sub{font-size:11px;opacity:.85;margin-top:3px;font-style:italic}
+.hero-pct{position:absolute;top:12px;right:14px;font-size:28px;font-weight:900;font-family:var(--fM);text-shadow:0 2px 8px rgba(0,0,0,.5);z-index:1}
+.hero-bar{position:absolute;bottom:0;left:0;height:5px;z-index:2;transition:width .5s}
+
+/* Clock */
+.clk{border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:14px;margin-bottom:10px;border:1.5px solid var(--bd);min-height:80px;z-index:1;position:relative}
+
+/* Group */
+.grp{border-radius:var(--r);margin-bottom:10px;overflow:hidden;border:1.5px solid var(--bd);transition:.2s;min-height:70px;position:relative;z-index:1}
+.grp:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.grp.gd{border-color:var(--ok)}
+.gh{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;overflow:hidden}
+.gh-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.08;z-index:0}
+.gh>*{position:relative;z-index:1}
+.g-ico{font-size:20px;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.g-info{flex:1;min-width:0}
+.g-tag{display:inline-block;padding:2px 10px;border-radius:8px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.g-ti{font-size:14px;font-weight:700;margin-left:6px}
+.g-ref{font-size:10px;color:var(--sb);margin-top:2px;font-style:italic}
+.g-brow{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.bb{display:inline-flex;padding:1px 6px;border-radius:5px;font-size:7px;font-weight:800;font-family:var(--fM)}
+.g-ts{font-size:9px;color:var(--ok);font-weight:700;margin-top:2px;font-family:var(--fM)}
+.g-cnt{font-size:12px;font-weight:800;white-space:nowrap;font-family:var(--fM)}
+.g-arr{font-size:10px;color:var(--sb);transition:transform .3s}.g-arr.op{transform:rotate(180deg)}
+.g-body{padding:0 14px 14px;animation:sd .25s ease}
+.g-note{font-size:14px;padding:8px 12px;border-radius:8px;margin-bottom:10px;line-height:1.4;font-family:var(--fC);border-left:3px solid #854F0B}
+
+/* Step */
+.stp{display:flex;align-items:flex-start;gap:10px;padding:8px 0;cursor:pointer}
+.stp+.stp{border-top:1px solid var(--bd)}
+.cb{width:24px;height:24px;border-radius:8px;border:2.5px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:.3s}
+.cb.ck{background:var(--ok);border-color:var(--ok);box-shadow:0 0 10px rgba(16,185,129,.3)}
+.cb.ck::after{content:'✓';color:#fff;font-size:13px;font-weight:900}
+.stx{font-size:13px;line-height:1.4}.stx.sd{opacity:.4;text-decoration:line-through}
+.sts{font-size:8px;color:var(--ok);font-weight:700;margin-top:2px;font-family:var(--fM)}
+.stm{font-size:9px;color:var(--sb);font-weight:700;padding:3px 10px;border-radius:8px;background:rgba(15,23,42,.5);font-family:var(--fM);white-space:nowrap}
+
+/* All Days */
+.wh{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.wbd{padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800}
+.dr{border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1.5px solid var(--bd);display:flex;align-items:center;gap:10px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.dr:hover{transform:translateX(3px)}.dr.dd{border-color:var(--ok)}
+.dr-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.06}
+.dnum{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;font-family:var(--fM);position:relative;z-index:1}
+
+/* Stats */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.sc{border-radius:var(--r);padding:14px;border-left:4px solid}
+.sl{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--sb)}
+.sv{font-size:26px;font-weight:900;margin-top:3px;font-family:var(--fM)}
+.wr{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.wl{width:45px;font-size:11px;font-weight:800}
+.wt{flex:1;height:10px;border-radius:5px;background:var(--bd);overflow:hidden}
+.wf{height:100%;border-radius:5px;transition:width .5s}
+.wp{width:32px;text-align:right;font-size:11px;font-weight:800;color:var(--sb);font-family:var(--fM)}
+.pnl{margin-top:14px;border-radius:var(--r);padding:14px;border:1.5px solid}
+.dz{margin-top:14px;padding:14px;border-radius:var(--r);border:1.5px solid #fca5a5;background:rgba(127,29,29,.1)}
+.si{width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid var(--bd);background:var(--cd);color:var(--tx);font-size:13px;outline:none;margin-bottom:12px}
+
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;z-index:200;animation:su .3s ease;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.sdot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.sdot.on{background:#34d399;box-shadow:0 0 6px #34d399}
+.sdot.off{background:#f59e0b}
+.cf{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.cp{position:absolute;animation:cfa 2.5s ease-out forwards}
+
+@keyframes sd{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes su{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes cfa{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),100vh) rotate(720deg);opacity:0}}
+@supports(padding:max(0px)){.hdr{padding-top:max(14px,env(safe-area-inset-top))}.cnt-in{padding-bottom:max(120px,calc(80px + env(safe-area-inset-bottom)))}}
+</style>
+</head>
+<body>
+<div id="cfl"></div>
+<div id="app"><div style="display:flex;align-items:center;justify-content:center;height:100vh"><div style="font-size:48px;animation:spin 1s linear infinite">📋</div></div></div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+// ── FIREBASE ────────────────────────────────────────────
+var db=null,connected=false,lastSync=null;
+try{firebase.initializeApp({apiKey:"AIzaSyBoRbWhtnL92f-EB0zrNKYRwZgSWi_F_P4",authDomain:"cpc-tracker-e3483.firebaseapp.com",databaseURL:"https://cpc-tracker-e3483-default-rtdb.firebaseio.com",projectId:"cpc-tracker-e3483",storageBucket:"cpc-tracker-e3483.firebasestorage.app",messagingSenderId:"200731769628",appId:"1:200731769628:web:a9516cffc4b3fb95ff58d9"});db=firebase.database();console.log("Firebase OK")}catch(e){console.error(e)}
+
+// ── TOPIC IMAGES (Unsplash) ─────────────────────────────
+var HI={1:"photo-1576091160550-2173dba999ef",2:"photo-1559757175-5700dde675bc",3:"photo-1530497610245-94d3c16cda28",4:"photo-1584982751601-97dcc096659c",5:"photo-1516549655169-df83a0774514",6:"photo-1576091160399-112ba8d25d1d",7:"photo-1434030216411-0b793f4b4173",8:"photo-1576091160550-2173dba999ef",9:"photo-1631815587646-b85a1bb027e1",10:"photo-1519494026892-80bbd2d6fd0d",11:"photo-1581595219315-a187dd40c322",12:"photo-1612349317150-e413f6a5b16d",13:"photo-1579684385127-1ef15d508118",14:"photo-1434030216411-0b793f4b4173",15:"photo-1559757175-5700dde675bc",16:"photo-1628595351029-c2bf17511435",17:"photo-1628348070889-cb656235b4eb",18:"photo-1628348070889-cb656235b4eb",19:"photo-1615631648086-325025c9e51e",20:"photo-1581595219315-a187dd40c322",21:"photo-1434030216411-0b793f4b4173",22:"photo-1551076805-e1869033e561",23:"photo-1631815588090-d4bfec5b1ccb",24:"photo-1584515933487-779824d29309",25:"photo-1559757148-5c350d0d3c56",26:"photo-1551884170-09fb70a3a2ed",27:"photo-1579684385127-1ef15d508118",28:"photo-1434030216411-0b793f4b4173",29:"photo-1516069677018-378515003435",30:"photo-1582719471384-894fbb16f461",31:"photo-1585435557343-3b092031a831",32:"photo-1551884170-09fb70a3a2ed",33:"photo-1587854692152-cbe660dbde88",34:"photo-1576091160550-2173dba999ef",35:"photo-1579684385127-1ef15d508118",36:"photo-1554224155-6726b3ff858f",37:"photo-1450101499163-c8848c66ca85",38:"photo-1589829545856-d10d557cf95f",39:"photo-1434030216411-0b793f4b4173",40:"photo-1576091160550-2173dba999ef",41:"photo-1576091160550-2173dba999ef",42:"photo-1586281380349-632531db7ed4",43:"photo-1434030216411-0b793f4b4173",44:"photo-1576091160550-2173dba999ef",45:"photo-1606326608606-aa0b62935f2b"};
+function hurl(d){return"https://images.unsplash.com/"+HI[d]+"?w=600&q=50"}
+function gurl(tg,ti){var t=(tg+" "+ti).toLowerCase();if(t.indexOf("muscul")>=0||t.indexOf("bone")>=0||t.indexOf("fracture")>=0||t.indexOf("joint")>=0||t.indexOf("arthro")>=0)return hurl(2);if(t.indexOf("cardio")>=0||t.indexOf("heart")>=0||t.indexOf("cabg")>=0||t.indexOf("pacemaker")>=0||t.indexOf("cath")>=0||t.indexOf("vascular")>=0||t.indexOf("bypass")>=0||t.indexOf("evar")>=0)return hurl(17);if(t.indexOf("respir")>=0||t.indexOf("lung")>=0||t.indexOf("bronch")>=0||t.indexOf("thorac")>=0||t.indexOf("nasal")>=0||t.indexOf("sinus")>=0)return hurl(16);if(t.indexOf("digest")>=0||t.indexOf("colon")>=0||t.indexOf("egd")>=0||t.indexOf("gi")>=0)return hurl(22);if(t.indexOf("brain")>=0||t.indexOf("nervous")>=0||t.indexOf("cranial")>=0||t.indexOf("spine")>=0)return hurl(25);if(t.indexOf("eye")>=0||t.indexOf("ophtho")>=0||t.indexOf("cataract")>=0||t.indexOf("visual")>=0)return hurl(26);if(t.indexOf("kidney")>=0||t.indexOf("urinary")>=0||t.indexOf("bladder")>=0)return hurl(23);if(t.indexOf("ob ")>=0||t.indexOf("matern")>=0||t.indexOf("female")>=0||t.indexOf("hyster")>=0||t.indexOf("deliver")>=0)return hurl(24);if(t.indexOf("hemic")>=0||t.indexOf("lymph")>=0||t.indexOf("blood")>=0||t.indexOf("spleen")>=0)return hurl(19);if(t.indexOf("lab")>=0||t.indexOf("path")>=0||t.indexOf("drug test")>=0||t.indexOf("panel")>=0)return hurl(30);if(t.indexOf("xray")>=0||t.indexOf("radio")>=0||t.indexOf("ct ")>=0||t.indexOf("mri")>=0||t.indexOf("imaging")>=0)return hurl(29);if(t.indexOf("immuniz")>=0||t.indexOf("vaccine")>=0)return hurl(31);if(t.indexOf("wound")>=0||t.indexOf("surgery")>=0||t.indexOf("global")>=0||t.indexOf("integument")>=0||t.indexOf("lesion")>=0)return hurl(11);if(t.indexOf("billing")>=0||t.indexOf("cms")>=0||t.indexOf("revenue")>=0)return hurl(36);if(t.indexOf("hipaa")>=0||t.indexOf("compliance")>=0||t.indexOf("fraud")>=0||t.indexOf("stark")>=0||t.indexOf("medicar")>=0||t.indexOf("payer")>=0||t.indexOf("abn")>=0)return hurl(38);if(t.indexOf("pill")>=0||t.indexOf("dme")>=0||t.indexOf("hcpcs")>=0||t.indexOf("drug")>=0||t.indexOf("infusion")>=0||t.indexOf("psych")>=0||t.indexOf("dialysis")>=0)return hurl(33);if(t.indexOf("e/m")>=0||t.indexOf("mdm")>=0||t.indexOf("hospital")>=0||t.indexOf("office")>=0||t.indexOf("visit")>=0||t.indexOf("ed ")>=0||t.indexOf("critical")>=0)return hurl(9);if(t.indexOf("ear")>=0||t.indexOf("myring")>=0||t.indexOf("cochlear")>=0)return hurl(26);if(t.indexOf("prefix")>=0||t.indexOf("suffix")>=0||t.indexOf("root")>=0||t.indexOf("terminol")>=0||t.indexOf("icd")>=0||t.indexOf("convention")>=0||t.indexOf("7th")>=0||t.indexOf("injury")>=0||t.indexOf("external")>=0)return hurl(4);if(t.indexOf("modifier")>=0||t.indexOf("code")>=0||t.indexOf("tab ")>=0||t.indexOf("cpt")>=0)return hurl(8);return null}
+
+// ── CURRICULUM (45 DAYS) ────────────────────────────────
+var D=[
+{d:1,t:"Medical terminology foundations",s:"Prefixes, suffixes & root words",g:[{tg:"Study",ti:"Medical prefixes A–Z",rf:"AAPC Study Guide pp. 1–15",nt:"hyper/hypo, tachy/brady, a-/an-, peri-, sub-",st:[{t:"Study prefixes A–H",m:10},{t:"Study prefixes H–Z",m:10},{t:"Write prefix + meaning + example",m:5}]},{tg:"Study",ti:"Medical suffixes",rf:"AAPC Study Guide pp. 15–28",nt:"-ectomy, -ostomy, -otomy, -plasty, -scopy",st:[{t:"Surgical suffixes",m:10},{t:"Diagnostic suffixes",m:10},{t:"Match 20 suffixes to definitions",m:5}]},{tg:"Study",ti:"Root words by body system",rf:"AAPC Study Guide pp. 28–45",nt:"cardi/o, hepat/o, nephr/o, oste/o, neur/o",st:[{t:"Roots: cardi/o, pulmon/o, gastr/o, hepat/o",m:10},{t:"Roots: nephr/o, oste/o, arthr/o, neur/o",m:10},{t:"Build 15 terms",m:5}]},{tg:"Review",ti:"Terminology self-quiz",rf:"AAPC Study Guide pp. 1–45",nt:"Miss >5 → re-read",st:[{t:"30 flashcards",m:10},{t:"Quiz all 30",m:10}]}]},
+{d:2,t:"MSK & cardiovascular anatomy",s:"Anatomy for coding accuracy",g:[{tg:"Study",ti:"Musculoskeletal anatomy",rf:"AAPC pp. 46–60",nt:"206 bones. CPT 20000-29999",st:[{t:"Axial skeleton",m:10},{t:"Appendicular skeleton",m:10},{t:"Muscle groups",m:5}]},{tg:"Study",ti:"Cardiovascular anatomy",rf:"AAPC pp. 61–72",nt:"4 chambers. LAD, LCx, RCA",st:[{t:"Heart chambers and valves",m:10},{t:"Major vessels",m:10},{t:"Draw heart diagram",m:5}]},{tg:"Practice",ti:"Anatomy identification drill",rf:"AAPC pp. 46–72",nt:"Link anatomy → code ranges",st:[{t:"Label 10 MSK structures",m:5},{t:"Match 8 CV to ICD-10",m:5},{t:"CPT ranges",m:5}]}]},
+{d:3,t:"Respiratory, digestive & nervous",s:"High-frequency anatomy",g:[{tg:"Study",ti:"Respiratory anatomy",rf:"AAPC pp. 73–82",nt:"Upper/Lower",st:[{t:"Upper: nose, sinuses, pharynx",m:10},{t:"Lower: bronchi, alveoli",m:5}]},{tg:"Study",ti:"Digestive anatomy",rf:"AAPC pp. 83–95",nt:"GI tract + accessory",st:[{t:"GI: mouth to SI",m:10},{t:"Large intestine",m:5},{t:"Liver, GB, pancreas",m:5}]},{tg:"Study",ti:"Nervous system anatomy",rf:"AAPC pp. 96–107",nt:"CNS+PNS",st:[{t:"CNS: brain, spinal cord",m:10},{t:"PNS: cranial nerves",m:10}]},{tg:"Review",ti:"Anatomy → ICD-10 chapters",rf:"ICD-10-CM Tabular",nt:"Each system = one chapter",st:[{t:"Match 10 diagnoses",m:10}]}]},
+{d:4,t:"ICD-10-CM structure & conventions",s:"Diagnosis coding foundation",g:[{tg:"Study",ti:"ICD-10-CM code format",rf:"ICD-10-CM Guidelines pp. i–x",nt:"Letter+2digits. Placeholder X.",st:[{t:"Alphanumeric structure",m:10},{t:"7th char: A/D/S",m:10},{t:"Placeholder X examples",m:5}]},{tg:"Study",ti:"ICD-10-CM conventions",rf:"ICD-10-CM Guidelines pp. x–xxv",nt:"NEC/NOS, Excludes1/2",st:[{t:"NEC vs NOS",m:5},{t:"Includes/Excludes",m:10},{t:"Code First, Use Additional",m:10}]},{tg:"Practice",ti:"Navigate Alphabetic Index",rf:"ICD-10-CM Alphabetic Index",nt:"Index → Tabular verify",st:[{t:"Look up 8 diagnoses",m:10},{t:"Find Excludes, 7th char",m:10}]},{tg:"Review",ti:"Conventions quiz",rf:"ICD-10-CM Guidelines",nt:"",st:[{t:"10 convention questions",m:10}]}]},
+{d:5,t:"Injury & external causes",s:"Ch.19-20 — most complex",g:[{tg:"Study",ti:"Chapter 19 injury codes",rf:"ICD-10-CM Guidelines",nt:"A/D/S MOST TESTED",st:[{t:"Read Ch.19 guidelines",m:10},{t:"A/D/S examples",m:10},{t:"5 scenarios",m:5}]},{tg:"Study",ti:"Chapter 20 external causes",rf:"ICD-10-CM Tabular p. 757",nt:"Secondary only. Y92/Y93.",st:[{t:"V/W/X codes",m:10},{t:"Y92 place, Y93 activity",m:5},{t:"3 injury scenarios",m:10}]},{tg:"Practice",ti:"7th character drill",rf:"ICD-10-CM Tabular",nt:"Stage of TREATMENT",st:[{t:"10 injury questions",m:10},{t:"Write rules for wrong",m:5}]}]},
+{d:6,t:"ICD-10-CM practice — 20 exercises",s:"Apply all skills",g:[{tg:"Practice",ti:"Exercises 1–10",rf:"ICD-10-CM Index + Tabular",nt:"Index → Tabular → chars",st:[{t:"Code 1–5 (timed)",m:10},{t:"Code 6–10",m:10}]},{tg:"Practice",ti:"Exercises 11–20",rf:"ICD-10-CM Tabular",nt:"Sequence acute first",st:[{t:"11–15: combo codes",m:10},{t:"16–20: injury + external",m:10}]},{tg:"Review",ti:"Self-grade",rf:"ICD-10-CM Guidelines",nt:"Find guideline for each wrong",st:[{t:"Grade all 20",m:5},{t:"Wrong: guideline, rule, redo",m:10}]}]},
+{d:7,t:"Week 1 review & quiz",s:"Consolidate week 1",g:[{tg:"Review",ti:"Terminology speed recall",rf:"AAPC pp. 1–45",nt:"Aim 80%+",st:[{t:"50 flashcards in 12 min",m:10},{t:"3 diagrams from memory",m:10}]},{tg:"Quiz",ti:"20-question quiz",rf:"ICD-10-CM + AAPC",nt:"<2 min each",st:[{t:"Q1–10: terminology",m:10},{t:"Q11–20: ICD-10-CM",m:10}]},{tg:"Plan",ti:"Plan Week 2",rf:"Results",nt:"<70% = priority",st:[{t:"Note weakest",m:5},{t:"Flag 2–3 topics",m:5}]}]},
+{d:8,t:"CPT structure & modifiers",s:"CPT coding foundation",g:[{tg:"Study",ti:"CPT codebook layout",rf:"CPT pp. xi–xx",nt:"6 sections",st:[{t:"Introduction, semicolon rule",m:10},{t:"6 sections + ranges",m:5},{t:"Symbols: bullet, +",m:5}]},{tg:"Study",ti:"CPT modifiers top 20",rf:"CPT Appendix A",nt:"Mod 25, 59, 51",st:[{t:"Modifiers 22–53",m:10},{t:"Modifiers 54–80, TC",m:10}]},{tg:"Practice",ti:"CPT navigation drill",rf:"CPT Index",nt:"Index → verify",st:[{t:"Locate 10 codes",m:10},{t:"Read descriptors",m:5}]}]},
+{d:9,t:"E/M office & outpatient",s:"Master the MDM table",g:[{tg:"Study",ti:"2021 E/M guidelines",rf:"CPT pp. 2–10",nt:"MDM OR total time",st:[{t:"Read guidelines",m:10},{t:"MDM table: 4×3",m:10}]},{tg:"Study",ti:"MDM deep dive",rf:"CPT pp. 3–8",nt:"Lowest 2 of 3",st:[{t:"Problems column",m:10},{t:"Data column",m:5},{t:"Risk column",m:5}]},{tg:"Practice",ti:"E/M scenarios",rf:"CPT 99202–99215",nt:"New vs Established",st:[{t:"3 new patient",m:10},{t:"3 established",m:10}]},{tg:"Review",ti:"MDM recall",rf:"CPT pp. 3–8",nt:"",st:[{t:"Write 4 levels from memory",m:10}]}]},
+{d:10,t:"Hospital, ED & critical care",s:"Facility-based E/M",g:[{tg:"Study",ti:"Hospital visits",rf:"CPT pp. 16–22",nt:"Initial/Subsequent/Discharge",st:[{t:"Initial 99221–99223",m:10},{t:"Subsequent + Discharge",m:10}]},{tg:"Study",ti:"ED & critical care",rf:"CPT pp. 23–28",nt:"ED: no new/est. CC: time",st:[{t:"ED 99281–99285",m:5},{t:"CC 99291–99292",m:10},{t:"4 scenarios",m:10}]},{tg:"Review",ti:"Comparison table",rf:"CPT pp. 16–30",nt:"",st:[{t:"Build table",m:10},{t:"5 Qs no CPT",m:5}]}]},
+{d:11,t:"Surgery & global package",s:"Rules for ALL surgery",g:[{tg:"Study",ti:"Global surgical package",rf:"CPT Surgery Guidelines",nt:"10/90-day global",st:[{t:"Read Guidelines",m:10},{t:"What IS included",m:5},{t:"What is NOT",m:5}]},{tg:"Study",ti:"Unbundling & modifiers",rf:"CPT Appendix A",nt:"Mod 59, 58/78/79",st:[{t:"Modifier 51 rules",m:10},{t:"58/78/79 return-to-OR",m:10}]},{tg:"Practice",ti:"Global package Qs",rf:"Surgery Guidelines",nt:"",st:[{t:"5 global Qs",m:10},{t:"3 modifier Qs",m:10}]}]},
+{d:12,t:"Integumentary system",s:"Wounds, lesions, breast",g:[{tg:"Study",ti:"Wound repair",rf:"CPT pp. 58–75",nt:"Simple/Intermediate/Complex",st:[{t:"3 levels + measurement",m:10},{t:"Group rules",m:5},{t:"Addition rules",m:5}]},{tg:"Study",ti:"Lesion excision",rf:"CPT pp. 76–90",nt:"Benign vs malignant",st:[{t:"Code selection",m:10},{t:"Destruction codes",m:5}]},{tg:"Practice",ti:"Integumentary exercises",rf:"CPT pp. 58–104",nt:"",st:[{t:"4 wound repair",m:10},{t:"4 lesion excisions",m:10}]}]},
+{d:13,t:"E/M + surgery — 25 Qs",s:"Mixed timed practice",g:[{tg:"Practice",ti:"E/M Q1–12",rf:"CPT pp. 1–42",nt:"",st:[{t:"Q1–6: office",m:10},{t:"Q7–12: inpatient",m:10}]},{tg:"Practice",ti:"Surgery Q13–25",rf:"CPT pp. 55–104",nt:"",st:[{t:"Q13–19: modifiers",m:10},{t:"Q20–25: integumentary",m:10}]},{tg:"Review",ti:"Error analysis",rf:"CPT",nt:"",st:[{t:"Grade",m:5},{t:"Find rules",m:10}]}]},
+{d:14,t:"Week 2 review & quiz",s:"CPT, E/M, surgery",g:[{tg:"Review",ti:"Modifier mastery",rf:"CPT Appendix A",nt:"25=minor. 57=MAJOR.",st:[{t:"When to use each",m:10},{t:"3 wrong scenarios",m:5}]},{tg:"Quiz",ti:"30-question quiz",rf:"CPT + ICD-10-CM",nt:"",st:[{t:"Q1–15: E/M",m:10},{t:"Q16–30: surgery",m:10}]},{tg:"Plan",ti:"Flag weak areas",rf:"Results",nt:"",st:[{t:"Grade",m:5},{t:"2 weakest",m:5}]}]},
+{d:15,t:"Musculoskeletal system",s:"Largest surgery section",g:[{tg:"Study",ti:"Fracture care",rf:"CPT pp. 105–130",nt:"Closed/Open/Percutaneous",st:[{t:"Fracture guidelines",m:10},{t:"Upper extremity",m:10},{t:"Lower extremity",m:5}]},{tg:"Study",ti:"Joints & arthroscopy",rf:"CPT pp. 131–155",nt:"Diagnostic bundled",st:[{t:"Arthrocentesis",m:5},{t:"Arthroscopy",m:10},{t:"Hip, Knee replacements",m:10}]},{tg:"Practice",ti:"MSK exercises",rf:"CPT pp. 105–173",nt:"",st:[{t:"5 fracture scenarios",m:10},{t:"5 joint scenarios",m:10}]}]},
+{d:16,t:"Respiratory system",s:"Nasal, thoracic",g:[{tg:"Study",ti:"Nasal & sinus (FESS)",rf:"CPT pp. 174–181",nt:"Each sinus separate",st:[{t:"Nasal procedures",m:10},{t:"FESS codes",m:10}]},{tg:"Study",ti:"Thoracic & lung",rf:"CPT pp. 182–192",nt:"VATS ≠ open",st:[{t:"Pleural",m:5},{t:"Lung resection",m:10},{t:"Bronchoscopy",m:10}]},{tg:"Practice",ti:"Respiratory exercises",rf:"CPT pp. 174–192",nt:"",st:[{t:"4 scenarios",m:10}]}]},
+{d:17,t:"Cardiovascular Part 1 — heart",s:"Hardest section — high frequency",g:[{tg:"Study",ti:"Cardiac catheterization",rf:"CPT pp. 193–212",nt:"Angiography=ADD-ON",st:[{t:"Left/right/combined",m:10},{t:"Angiography add-ons",m:10}]},{tg:"Study",ti:"CABG",rf:"CPT pp. 213–220",nt:"Count grafts",st:[{t:"Arterial CABG",m:10},{t:"Venous + combined",m:10}]},{tg:"Study",ti:"Pacemaker & ICD",rf:"CPT pp. 221–233",nt:"Replacement=generator ONLY",st:[{t:"Initial insertion",m:10},{t:"Replacement codes",m:5}]}]},
+{d:18,t:"Cardiovascular Part 2 — vascular",s:"Arteries, veins, endovascular",g:[{tg:"Study",ti:"Endovascular (EVAR)",rf:"CPT pp. 234–240",nt:"Catheter-based",st:[{t:"EVAR codes",m:10},{t:"Peripheral stenting",m:10}]},{tg:"Study",ti:"Open vascular",rf:"CPT pp. 240–246",nt:"Bypass, AV fistula",st:[{t:"Bypass grafts",m:10},{t:"Dialysis access",m:5}]},{tg:"Practice",ti:"Vascular exercises",rf:"CPT pp. 193–246",nt:"",st:[{t:"4 scenarios",m:10},{t:"2 pacemaker",m:5}]}]},
+{d:19,t:"Hemic, lymphatic, mediastinum",s:"Smaller sections",g:[{tg:"Study",ti:"Hemic & lymphatic",rf:"CPT pp. 247–254",nt:"BM biopsy vs aspiration",st:[{t:"Spleen",m:5},{t:"BM + lymph nodes",m:10}]},{tg:"Study",ti:"Mediastinum & diaphragm",rf:"CPT pp. 255–256",nt:"",st:[{t:"Mediastinum",m:5},{t:"Diaphragm",m:5}]},{tg:"Review",ti:"CV consolidation",rf:"CPT pp. 193–256",nt:"",st:[{t:"Review CABG, pacemaker",m:10},{t:"3 mixed CV",m:10}]}]},
+{d:20,t:"Surgery practice — 30 Qs",s:"MSK through CV",g:[{tg:"Practice",ti:"Q1–15",rf:"CPT pp. 105–254",nt:"",st:[{t:"Q1–8: MSK",m:10},{t:"Q9–15: resp, CV",m:10}]},{tg:"Practice",ti:"Q16–30",rf:"CPT pp. 55–254",nt:"",st:[{t:"Q16–22: vascular",m:10},{t:"Q23–30: mixed",m:10}]},{tg:"Review",ti:"Error analysis",rf:"CPT",nt:"",st:[{t:"Grade",m:5},{t:"Write rules",m:10}]}]},
+{d:21,t:"Mini-exam — 40 Qs",s:"Simulate CPC",g:[{tg:"Exam",ti:"Q1–20",rf:"All 3 books",nt:"Mark and move on",st:[{t:"Q1–20 / 40 min",m:10}]},{tg:"Exam",ti:"Q21–40",rf:"CPT + ICD",nt:"",st:[{t:"Q21–40 / 40 min",m:10}]},{tg:"Review",ti:"Score",rf:"Exam",nt:"",st:[{t:"Grade, ID weakest",m:10},{t:"3 topics for Wk 4",m:5}]}]},
+{d:22,t:"Digestive system",s:"Highest surgery frequency",g:[{tg:"Study",ti:"Upper GI (EGD)",rf:"CPT pp. 257–272",nt:"Esophagoscopy vs EGD",st:[{t:"Upper GI guidelines",m:10},{t:"EGD codes",m:10}]},{tg:"Study",ti:"Colonoscopy",rf:"CPT pp. 272–285",nt:"Cecum vs sigmoid",st:[{t:"Colonoscopy codes",m:10},{t:"Lap vs open",m:5}]},{tg:"Practice",ti:"Digestive exercises",rf:"CPT pp. 257–310",nt:"",st:[{t:"5 endoscopy",m:10},{t:"3 open GI",m:10}]}]},
+{d:23,t:"Urinary system",s:"Kidney, ureter, bladder",g:[{tg:"Study",ti:"Kidney & ureter",rf:"CPT pp. 311–325",nt:"ESWL 50590",st:[{t:"Nephrectomy",m:10},{t:"Stone procedures",m:10}]},{tg:"Study",ti:"Bladder & urethra",rf:"CPT pp. 326–340",nt:"TURBT by size",st:[{t:"Cystoscopy bundling",m:5},{t:"TURBT",m:5},{t:"Urodynamics",m:10}]},{tg:"Practice",ti:"Urinary exercises",rf:"CPT pp. 311–340",nt:"",st:[{t:"4 scenarios",m:10},{t:"2 extra",m:5}]}]},
+{d:24,t:"Genital & maternity",s:"OB global heavily tested",g:[{tg:"Study",ti:"Male genital",rf:"CPT pp. 341–352",nt:"TURP=urinary section!",st:[{t:"Prostate",m:10},{t:"Testicular",m:5}]},{tg:"Study",ti:"Female & OB global",rf:"CPT pp. 353–382",nt:"Ante+delivery+post",st:[{t:"Hysterectomy types",m:10},{t:"OB global vs split",m:10}]},{tg:"Practice",ti:"Genital & OB exercises",rf:"CPT pp. 341–382",nt:"",st:[{t:"3 male genital",m:5},{t:"4 OB scenarios",m:10}]}]},
+{d:25,t:"Nervous system",s:"Brain, spine, nerves",g:[{tg:"Study",ti:"Cranial procedures",rf:"CPT pp. 387–410",nt:"Burr holes vs craniotomy",st:[{t:"Burr hole codes",m:10},{t:"Craniotomy",m:10}]},{tg:"Study",ti:"Spine & peripheral",rf:"CPT pp. 410–430",nt:"Fusion separate",st:[{t:"Decompression",m:10},{t:"SCS, pump, carpal tunnel",m:10}]},{tg:"Practice",ti:"Nervous exercises",rf:"CPT pp. 387–430",nt:"",st:[{t:"4 spine",m:10},{t:"2 cranial",m:5}]}]},
+{d:26,t:"Eye & ear",s:"Ophthalmology & ENT",g:[{tg:"Study",ti:"Eye — cataract & retinal",rf:"CPT pp. 431–454",nt:"Phaco 66984",st:[{t:"Cataract codes",m:10},{t:"Retinal procedures",m:10}]},{tg:"Study",ti:"Ear procedures",rf:"CPT pp. 455–460",nt:"Myringotomy, tympanoplasty",st:[{t:"Ear procedures",m:10},{t:"Cochlear implant",m:5}]},{tg:"Practice",ti:"Eye & ear exercises",rf:"CPT pp. 431–460",nt:"",st:[{t:"3 eye",m:10},{t:"2 ear",m:5}]}]},
+{d:27,t:"Multi-system — 30 Qs",s:"All Week 4 systems",g:[{tg:"Practice",ti:"Q1–15",rf:"CPT pp. 257–382",nt:"",st:[{t:"Q1–8: digestive",m:10},{t:"Q9–15: urinary, genital",m:10}]},{tg:"Practice",ti:"Q16–30",rf:"CPT pp. 387–460",nt:"",st:[{t:"Q16–22: nervous",m:10},{t:"Q23–30: eye, ear",m:10}]},{tg:"Review",ti:"Error analysis",rf:"CPT",nt:"",st:[{t:"Grade",m:5},{t:"Update weak areas",m:5}]}]},
+{d:28,t:"Week 4 quiz",s:"All surgery",g:[{tg:"Review",ti:"Rapid recall",rf:"CPT pp. 105–460",nt:"",st:[{t:"Digestive, urinary, GYN",m:10},{t:"Nervous, eye, ear",m:5}]},{tg:"Quiz",ti:"25-question quiz",rf:"CPT surgery",nt:"",st:[{t:"Q1–12",m:10},{t:"Q13–25",m:10}]},{tg:"Plan",ti:"Plan Week 5",rf:"Results",nt:"",st:[{t:"Grade, 2 priorities",m:5}]}]},
+{d:29,t:"Radiology",s:"TC, professional, imaging",g:[{tg:"Study",ti:"Radiology components",rf:"CPT Radiology Guidelines",nt:"TC/26/Global",st:[{t:"TC vs professional",m:10},{t:"Contrast rules",m:5},{t:"S&I codes",m:5}]},{tg:"Study",ti:"Imaging by modality",rf:"CPT pp. 464–510",nt:"",st:[{t:"X-ray, CT",m:10},{t:"Ultrasound",m:10}]},{tg:"Practice",ti:"Radiology exercises",rf:"CPT pp. 461–510",nt:"",st:[{t:"5 scenarios",m:10}]}]},
+{d:30,t:"Pathology & lab",s:"Panels, drug testing, surg path",g:[{tg:"Study",ti:"Lab panels",rf:"CPT pp. 511–522",nt:"CMP=14, BMP=8",st:[{t:"Metabolic panels",m:10},{t:"Organ panels",m:5}]},{tg:"Study",ti:"Drug testing & surg path",rf:"CPT pp. 522–545",nt:"Presumptive vs definitive",st:[{t:"Drug testing",m:10},{t:"Surg path levels",m:10}]},{tg:"Practice",ti:"Lab exercises",rf:"CPT pp. 511–558",nt:"",st:[{t:"4 lab",m:10},{t:"3 surg path",m:5}]}]},
+{d:31,t:"Medicine — immunizations, psych",s:"CPT 90281–99607",g:[{tg:"Study",ti:"Immunization admin",rf:"CPT pp. 559–568",nt:"90460 vs 90471",st:[{t:"Admin guidelines",m:5},{t:"Vaccine products",m:10},{t:"3 scenarios",m:5}]},{tg:"Study",ti:"Psychiatry & dialysis",rf:"CPT pp. 569–580",nt:"Time-based",st:[{t:"Psychotherapy",m:10},{t:"ESRD dialysis",m:10}]},{tg:"Practice",ti:"Exercises",rf:"CPT pp. 559–600",nt:"",st:[{t:"3+2 scenarios",m:10},{t:"2 dialysis",m:5}]}]},
+{d:32,t:"Medicine — ophtho, CV, infusions",s:"High-yield",g:[{tg:"Study",ti:"Ophtho E/M",rf:"CPT pp. 600–610",nt:"NOT 99xxx codes",st:[{t:"92002–92014",m:10},{t:"Visual field, tonometry",m:10}]},{tg:"Study",ti:"CV & infusions",rf:"CPT pp. 611–635",nt:"Sequential rules",st:[{t:"Echo types",m:10},{t:"Infusion rules",m:5}]},{tg:"Practice",ti:"Exercises",rf:"CPT pp. 559–650",nt:"",st:[{t:"3+2 scenarios",m:10},{t:"2 infusion",m:5}]}]},
+{d:33,t:"HCPCS Level II",s:"DME, drugs, supplies",g:[{tg:"Study",ti:"HCPCS structure",rf:"HCPCS 2025",nt:"A/E/J/L sections",st:[{t:"Introduction",m:5},{t:"A codes",m:10},{t:"HCPCS vs CPT",m:5}]},{tg:"Study",ti:"DME & drug codes",rf:"HCPCS E & J",nt:"4 DME criteria",st:[{t:"E codes",m:10},{t:"J codes",m:10}]},{tg:"Study",ti:"Modifiers",rf:"HCPCS Modifiers",nt:"LT/RT, GA/GZ",st:[{t:"L codes",m:5},{t:"HCPCS modifiers",m:10}]}]},
+{d:34,t:"Modifier mastery",s:"15–20% of CPC",g:[{tg:"Study",ti:"Critical CPT modifiers",rf:"CPT Appendix A",nt:"Mod 25 most tested",st:[{t:"22–51 scenarios",m:10},{t:"52–59 scenarios",m:10}]},{tg:"Study",ti:"Return-to-OR",rf:"CPT Appendix A",nt:"58/78/79",st:[{t:"62–82 scenarios",m:10},{t:"Team rules",m:5}]},{tg:"Practice",ti:"Modifier Qs",rf:"CPT+HCPCS",nt:"57=MAJOR, 25=MINOR",st:[{t:"15 questions",m:10},{t:"Review wrong",m:5}]}]},
+{d:35,t:"Mixed — 40 Qs",s:"Week 5 consolidation",g:[{tg:"Practice",ti:"Q1–20",rf:"CPT+HCPCS",nt:"",st:[{t:"Q1–10: radiology",m:10},{t:"Q11–20: path/lab",m:10}]},{tg:"Practice",ti:"Q21–40",rf:"Medicine+HCPCS",nt:"",st:[{t:"Q21–30: medicine",m:10},{t:"Q31–40: HCPCS",m:10}]},{tg:"Review",ti:"Errors",rf:"All",nt:"",st:[{t:"Grade",m:10},{t:"Deep-dive",m:10}]}]},
+{d:36,t:"Billing & CMS-1500",s:"Revenue cycle",g:[{tg:"Study",ti:"Revenue cycle",rf:"AAPC Study Guide",nt:"9 steps",st:[{t:"Memorize 9 steps",m:10},{t:"Clean vs dirty",m:5}]},{tg:"Study",ti:"CMS-1500",rf:"CMS-1500 form",nt:"Box 21/24D/33",st:[{t:"Boxes 1–13",m:10},{t:"Boxes 14–33",m:10}]},{tg:"Practice",ti:"Fill CMS-1500",rf:"Blank form",nt:"",st:[{t:"Boxes 1–13",m:5},{t:"Boxes 21, 24",m:10}]}]},
+{d:37,t:"Payer guidelines",s:"Medicare, Medicaid",g:[{tg:"Study",ti:"Medicare Parts",rf:"AAPC Study Guide",nt:"A=hosp, B=physician",st:[{t:"A vs B",m:10},{t:"C and D",m:5}]},{tg:"Study",ti:"LCDs, NCDs, ABN",rf:"AAPC Study Guide",nt:"GA/GZ",st:[{t:"LCD vs NCD",m:10},{t:"ABN rules",m:10}]},{tg:"Review",ti:"Payer Qs",rf:"AAPC",nt:"",st:[{t:"10 scenarios",m:10}]}]},
+{d:38,t:"Compliance & HIPAA",s:"Reliable points",g:[{tg:"Study",ti:"HIPAA",rf:"AAPC Study Guide",nt:"18 identifiers",st:[{t:"PHI identifiers",m:5},{t:"Privacy Rule",m:10},{t:"Security safeguards",m:5}]},{tg:"Study",ti:"FCA, Stark, AKS",rf:"AAPC — Fraud",nt:"$13K–$27K/claim",st:[{t:"False Claims",m:10},{t:"Stark vs AKS",m:10}]},{tg:"Practice",ti:"Compliance Qs",rf:"AAPC",nt:"",st:[{t:"10 scenarios",m:10}]}]},
+{d:39,t:"Mock exam 1 — 150 Qs",s:"Full simulation",g:[{tg:"Exam",ti:"Q1–75",rf:"All 3 books",nt:"~2:16 each",st:[{t:"Q1–37",m:10},{t:"Q38–75",m:10}]},{tg:"Exam",ti:"Q76–150",rf:"All 3 books",nt:"No blanks",st:[{t:"Q76–113",m:10},{t:"Q114–150",m:10}]}]},
+{d:40,t:"Mock 1 review",s:"Analyze wrongs",g:[{tg:"Review",ti:"Score breakdown",rf:"Exam",nt:"",st:[{t:"Score by section",m:10},{t:"Bottom 3",m:5}]},{tg:"Review",ti:"Wrong answers",rf:"All books",nt:"",st:[{t:"First half",m:10},{t:"Second half",m:10}]},{tg:"Plan",ti:"Plan Day 41",rf:"Scores",nt:"",st:[{t:"3 weakest",m:5},{t:"10 extra Qs",m:5}]}]},
+{d:41,t:"Weak area deep dive",s:"Targeted review",g:[{tg:"Study",ti:"Weakest #1",rf:"Pages",nt:"",st:[{t:"Re-read",m:10},{t:"10 Qs",m:10}]},{tg:"Study",ti:"Weakest #2",rf:"Pages",nt:"",st:[{t:"Re-read",m:10},{t:"10 Qs",m:10}]},{tg:"Review",ti:"Modifier sprint",rf:"Appendix A",nt:"",st:[{t:"20 modifiers recall",m:10}]}]},
+{d:42,t:"Tab & prep codebooks",s:"Speed prep",g:[{tg:"Prep",ti:"Tab CPT",rf:"CPT",nt:"Saves 30–45 min",st:[{t:"Color tabs",m:10},{t:"Sticky notes",m:10}]},{tg:"Prep",ti:"Tab ICD-10-CM",rf:"Tabular",nt:"",st:[{t:"Tab chapters",m:10},{t:"Special tables",m:5}]},{tg:"Prep",ti:"Tab HCPCS + drill",rf:"HCPCS",nt:"",st:[{t:"Tab sections",m:5},{t:"20 codes <30s",m:10}]}]},
+{d:43,t:"Mock exam 2 — 150 Qs",s:"Final simulation",g:[{tg:"Exam",ti:"Q1–75",rf:"All books",nt:"Use tabs!",st:[{t:"Q1–37",m:10},{t:"Q38–75",m:10}]},{tg:"Exam",ti:"Q76–150",rf:"All books",nt:"",st:[{t:"Q76–113",m:10},{t:"Q114–150",m:10}]}]},
+{d:44,t:"Mock 2 review & flashcards",s:"Close gaps",g:[{tg:"Review",ti:"Compare mocks",rf:"Both exams",nt:"",st:[{t:"Score comparison",m:10},{t:"Rule cards",m:10}]},{tg:"Review",ti:"Wrong answers",rf:"All books",nt:"",st:[{t:"All wrong",m:10},{t:"5 wrong on BOTH",m:10}]},{tg:"Review",ti:"Flashcard sprint",rf:"Stack",nt:"",st:[{t:"50 cards/20 min",m:10}]}]},
+{d:45,t:"Final prep — exam day",s:"Rest & trust your work",g:[{tg:"Review",ti:"High-yield skim",rf:"CPT + ICD Guidelines",nt:"Light only",st:[{t:"MDM table",m:5},{t:"Modifier list",m:5},{t:"ICD conventions",m:5}]},{tg:"Prep",ti:"Logistics",rf:"3 codebooks",nt:"Books, pencils, water, watch",st:[{t:"Verify packed",m:5},{t:"Arrive early, gov ID",m:5}]},{tg:"Prep",ti:"Rest — you're ready",rf:"44 days of prep",nt:"",st:[{t:"3 confidence points",m:5},{t:"Sleep > cramming",m:5}]}]}
+];
+
+var WFD=[0,0,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,5,5,6,6,6];
+var WCR=["#185FA5","#3B6D11","#3C3489","#854F0B","#993C1D","#0F6E56","#72243E"];
+var WBG=["#E6F1FB","#EAF3DE","#EEEDFE","#FAEEDA","#FAECE7","#E1F5EE","#FBEAF0"];
+var TG={Study:{bg:"#E6F1FB",c:"#0C447C",e:"📖",bc:"#185FA5"},Practice:{bg:"#EAF3DE",c:"#3B6D11",e:"✏️",bc:"#3B6D11"},Review:{bg:"#EEEDFE",c:"#3C3489",e:"🔄",bc:"#3C3489"},Quiz:{bg:"#FAEEDA",c:"#854F0B",e:"📝",bc:"#854F0B"},Plan:{bg:"#FAECE7",c:"#993C1D",e:"📋",bc:"#993C1D"},Prep:{bg:"#E1F5EE",c:"#0F6E56",e:"🎯",bc:"#0F6E56"},Exam:{bg:"#FBEAF0",c:"#72243E",e:"🏆",bc:"#72243E"}};
+var BK={cpt:{n:"📘 CPT",c:"#1e40af",bg:"#dbeafe"},icd:{n:"📗 ICD-10",c:"#166534",bg:"#dcfce7"},hcpcs:{n:"📙 HCPCS",c:"#92400e",bg:"#fef3c7"},aapc:{n:"📕 AAPC",c:"#5b21b6",bg:"#ede9fe"},guide:{n:"📓 Guide",c:"#9d174d",bg:"#fce7f3"}};
+function dBk(rf){if(!rf)return[];var r=rf.toLowerCase(),b=[];if(r.indexOf("cpt")>=0||r.indexOf("appendix")>=0||r.indexOf("surgery")>=0)b.push("cpt");if(r.indexOf("icd")>=0||r.indexOf("tabular")>=0)b.push("icd");if(r.indexOf("hcpcs")>=0)b.push("hcpcs");if(r.indexOf("aapc")>=0||r.indexOf("study guide")>=0)b.push("aapc");if(r.indexOf("guideline")>=0)b.push("guide");if(r.indexOf("all 3")>=0)b.push("cpt","icd","hcpcs");var u=[];b.forEach(function(x){if(u.indexOf(x)<0)u.push(x)});return u}
+function sk(d,g,s){return d+"_"+g+"_"+s}
+function fmt(iso){if(!iso||iso===true)return"";try{var d=new Date(iso);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}catch(e){return""}}
+
+// ── STATE + SYNC ────────────────────────────────────────
+var S={c:{},d:0};var view="today",exp={},search="",toastData=null,prevDone={};
+var syncError="";
+
+function gc(){return Math.random().toString(36).substring(2,8).toUpperCase()}
+
+// Get or create sync ID from URL hash
+var syncCode=location.hash.replace("#","").trim();
+if(!syncCode||syncCode.length<4){syncCode=localStorage.getItem("cpc-sync-id")||"";if(!syncCode||syncCode.length<4)syncCode=gc()}
+localStorage.setItem("cpc-sync-id",syncCode);
+try{location.hash=syncCode}catch(e){}
+
+// Firebase path — flat, no nesting
+var SYNC_KEY=syncCode;
+
+function push(){
+  try{localStorage.setItem("cpc-d-"+syncCode,JSON.stringify({c:S.c,d:S.d}))}catch(e){}
+  if(!db){syncError="No DB";return}
+  db.ref(SYNC_KEY).set({c:S.c,d:S.d,ts:Date.now()}).then(function(){connected=true;lastSync=new Date();syncError=""}).catch(function(e){connected=false;syncError=e.message||"Write failed";console.error("Push error:",e)})
+}
+function loadLocal(){try{var r=localStorage.getItem("cpc-d-"+syncCode);if(r){var p=JSON.parse(r);S.c=p.c||{};S.d=p.d||0}}catch(e){}}
+function startSync(){
+  if(!db){syncError="Firebase not loaded";R();return}
+  console.log("Sync key:",SYNC_KEY);
+  db.ref(SYNC_KEY).on("value",function(snap){
+    var val=snap.val();
+    if(!val){push();return}
+    var m=Object.assign({},S.c);
+    if(val.c)Object.keys(val.c).forEach(function(k){if(val.c[k]&&!m[k])m[k]=val.c[k]});
+    S.c=m;S.d=Math.max(S.d,val.d||0);
+    connected=true;lastSync=new Date();syncError="";
+    try{localStorage.setItem("cpc-d-"+syncCode,JSON.stringify({c:S.c,d:S.d}))}catch(e){}
+    R()
+  },function(e){connected=false;syncError=e.message||"Read failed";console.error("Sync error:",e);R()})
+}
+function copyLink(){var u=location.origin+location.pathname+"#"+syncCode;try{navigator.clipboard.writeText(u);toast("📋 Link copied!")}catch(e){prompt("Copy this link:",u)}}
+
+function togStep(k){if(S.c[k])delete S.c[k];else S.c[k]=new Date().toISOString();push();R()}
+function setDay(v){S.d=v;push();R()}
+function toast(m,bg){toastData={m:m,bg:bg||"#10b981"};var t=document.createElement("div");t.className="toast";t.style.background=bg||"#10b981";t.textContent=m;document.body.appendChild(t);setTimeout(function(){toastData=null;if(t.parentNode)t.parentNode.removeChild(t)},2500)}
+function confetti(){var l=document.getElementById("cfl");l.innerHTML="";l.className="cf";var c=["#FF6B6B","#4ECDC4","#45B7D1","#FFD93D","#DDA0DD","#96CEB4"];for(var i=0;i<35;i++){var p=document.createElement("div");p.className="cp";p.style.cssText="left:"+Math.random()*100+"%;top:-10px;background:"+c[~~(Math.random()*c.length)]+";width:"+(Math.random()*7+5)+"px;height:"+(Math.random()*7+5)+"px;border-radius:"+(Math.random()>.5?"50%":"2px")+";--dx:"+(Math.random()-.5)*180+"px;animation-delay:"+Math.random()*.4+"s;animation-duration:"+(Math.random()+2)+"s";l.appendChild(p)}setTimeout(function(){l.innerHTML=""},3500)}
+
+function dst(i){return D[i].g.reduce(function(a,g){return a+g.st.length},0)}
+function dsd(i){return D[i].g.reduce(function(a,g,gi){return a+g.st.filter(function(_,si){return!!S.c[sk(i,gi,si)]}).length},0)}
+function did(i){return dsd(i)===dst(i)}
+function dpct(i){var t=dst(i);return t?Math.round(dsd(i)/t*100):0}
+function tS(){return D.reduce(function(a,_,i){return a+dst(i)},0)}
+function tD(){return Object.values(S.c).filter(function(v){return!!v}).length}
+function stk(){var s=0;for(var i=S.d;i>=0;i--){if(did(i))s++;else break}return s}
+function dmT(i){return D[i].g.reduce(function(a,g){return a+g.st.reduce(function(b,s){return b+s.m},0)},0)}
+function dmD(i){return D[i].g.reduce(function(a,g,gi){return a+g.st.reduce(function(b,s,si){return b+(S.c[sk(i,gi,si)]?s.m:0)},0)},0)}
+function gDA(di,gi){var l=null;for(var si=0;si<D[di].g[gi].st.length;si++){var t=S.c[sk(di,gi,si)];if(!t)return null;if(!l||t>l)l=t}return l}
+
+function clockSVG(done,total,color){var pct=total?done/total:0,ang=pct*360,cx=58,cy=58,r=46,sw=9;function rad(a){return(a-90)*Math.PI/180}var ticks="";for(var i=0;i<12;i++){var a=i*30,r1=43,r2=i%3===0?37:40;ticks+='<line x1="'+(cx+r1*Math.cos(rad(a)))+'" y1="'+(cy+r1*Math.sin(rad(a)))+'" x2="'+(cx+r2*Math.cos(rad(a)))+'" y2="'+(cy+r2*Math.sin(rad(a)))+'" stroke="'+(i%3===0?"#64748b":"#94a3b8")+'" stroke-width="'+(i%3===0?2:1)+'" opacity="'+(i%3===0?.5:.25)+'"/>';}var arc="";if(pct>0&&pct<1){var sx=cx+r*Math.cos(rad(0)),sy=cy+r*Math.sin(rad(0)),ex=cx+r*Math.cos(rad(ang)),ey=cy+r*Math.sin(rad(ang));arc='<path d="M'+sx+','+sy+'A'+r+','+r+',0,'+(ang>180?1:0)+',1,'+ex+','+ey+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" opacity=".8"/>';}else if(pct>=1)arc='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" opacity=".8"/>';var hand="";if(pct>0&&pct<1){var hx=cx+32*Math.cos(rad(ang)),hy=cy+32*Math.sin(rad(ang));hand='<line x1="'+cx+'" y1="'+cy+'" x2="'+hx+'" y2="'+hy+'" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" opacity=".6"/><circle cx="'+hx+'" cy="'+hy+'" r="3" fill="'+color+'" opacity=".7"/>';}else if(pct>=1)hand='<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="900" fill="'+color+'">✓</text>';return'<svg viewBox="0 0 116 116" style="width:90px;height:90px;flex-shrink:0"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#334155" stroke-width="'+sw+'" opacity=".3"/>'+ticks+arc+hand+'<circle cx="'+cx+'" cy="'+cy+'" r="3" fill="'+color+'"/><text x="'+cx+'" y="'+(cy-7)+'" text-anchor="middle" font-size="7" font-weight="800" fill="#94a3b8">STUDY</text><text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-size="14" font-weight="900" fill="'+color+'">'+done+'m</text><text x="'+cx+'" y="'+(cy+17)+'" text-anchor="middle" font-size="7" fill="#94a3b8">of '+total+'m</text></svg>'}
+
+// ── RENDER ──────────────────────────────────────────────
+function R(){var app=document.getElementById("app");
+var wi=WFD[S.d],ts=tS(),td=tD(),op=ts?Math.round(td/ts*100):0,dc=D.filter(function(_,i){return did(i)}).length,sk2=stk();
+var dd=did(S.d);if(dd&&!prevDone[S.d]){prevDone[S.d]=true;confetti();toast("🎉 Day "+(S.d+1)+" complete!")}prevDone[S.d]=dd;
+var h='<div class="app">';
+
+// Header
+h+='<div class="hdr" style="background:linear-gradient(135deg,'+WCR[wi]+'dd,'+WCR[(wi+1)%7]+'bb)"><div class="hdr-in"><div><h1>📋 CPC 45-Day Tracker</h1><div class="sub">AAPC 2025 <span class="sdot '+(connected?"on":"off")+'" style="margin-left:4px"></span> <button onclick="copyLink()" style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:6px;font-size:8px;font-weight:800;color:#fff;margin-left:4px;font-family:var(--fM);letter-spacing:1px">🔗 '+syncCode+'</button></div></div><div class="hdr-st"><div class="sp"><div class="v">'+op+'%</div><div class="l">Done</div></div><div class="sp"><div class="v">'+dc+'/45</div><div class="l">Days</div></div><div class="sp"><div class="v">🔥'+sk2+'</div><div class="l">Streak</div></div></div></div><div class="pbar"><div class="pfill" style="width:'+op+'%"></div></div></div>';
+
+// Nav
+h+='<div class="nav G"><div class="nav-in">';
+["today","all","stats"].forEach(function(v){var l=v==="today"?"📅 Today":v==="all"?"📚 All Days":"📊 Stats";h+='<button style="'+(view===v?"color:"+WCR[wi]+";border-bottom-color:"+WCR[wi]:"")+'" onclick="view=\''+v+'\';R()">'+l+'</button>'});
+h+='</div></div>';
+
+h+='<div class="cnt"><div class="cnt-in">';
+
+// Watermark
+h+='<div class="watermark">'+(S.d+1)+'</div>';
+
+if(view==="today"){
+var di=S.d,d=D[di],p=dpct(di);
+// Day dots
+h+='<div class="dnav"><button '+(S.d===0?"disabled":"")+'  style="opacity:'+(S.d===0?.3:1)+'" onclick="setDay(Math.max(0,S.d-1))">◀</button><div class="ddots">';
+for(var w=0;w<7;w++){h+='<div class="wdots">';D.forEach(function(_,i){if(WFD[i]!==w)return;var dn=did(i),pt=dsd(i)>0&&!dn,cr=i===S.d;h+='<div class="dot'+(cr?" cur":"")+(dn?" dn":"")+'" style="background:'+(dn?"":pt?WCR[w]+"77":cr?WCR[w]:"var(--bd)")+";"+( cr?"border:2px solid "+WCR[w]+";box-shadow:0 0 8px "+WCR[w]+"44":"")+'" onclick="setDay('+i+')" title="Day '+(i+1)+'"></div>'});h+='</div>'}
+h+='</div><button '+(S.d===44?"disabled":"")+'  style="opacity:'+(S.d===44?.3:1)+'" onclick="setDay(Math.min(44,S.d+1))">▶</button></div>';
+
+// Hero with image + day watermark
+h+='<div class="hero" style="background-image:url(\''+hurl(di+1)+'\');background-color:'+WCR[WFD[di]]+'"><div class="hero-wm">'+(di+1)+'</div><div class="hero-ov"><div class="hero-tag">Day '+(di+1)+' · Week '+(WFD[di]+1)+'</div><div class="hero-ti">'+d.t+'</div><div class="hero-sub">'+d.s+'</div></div><div class="hero-pct" style="color:'+(p===100?"#34d399":"rgba(255,255,255,.9)")+'">'+p+'%</div><div class="hero-bar" style="width:'+p+'%;background:linear-gradient(90deg,rgba(255,255,255,.5),#34d399)"></div></div>';
+
+// Clock
+var mt=dmT(di),md=dmD(di),clkC=p===100?"#10b981":WCR[WFD[di]];
+h+='<div class="clk G" style="border-left:4px solid '+WCR[WFD[di]]+'">'+clockSVG(md,mt,clkC)+'<div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--sb)">⏱ Day '+(di+1)+' Study Time</div><div style="font-size:17px;font-weight:900;margin-top:3px;font-family:var(--fM);color:'+clkC+'">'+md+' min done</div><div style="font-size:11px;color:var(--sb);font-weight:700;margin-top:1px">'+(mt-md)+' left · '+mt+' total</div>';
+h+='<div style="margin-top:6px;border-top:1px solid var(--bd);padding-top:6px">';
+d.g.forEach(function(g,gi){var gmt=g.st.reduce(function(a,s){return a+s.m},0),gmd=g.st.reduce(function(a,s,si){return a+(S.c[sk(di,gi,si)]?s.m:0)},0),tg=TG[g.tg]||TG.Study;h+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span style="display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:'+(gmd===gmt?"var(--ok)":tg.bc)+'"></span><span style="font-size:8px;font-weight:700">'+(g.ti.length>24?g.ti.slice(0,24)+"…":g.ti)+'</span></span><span style="font-size:8px;font-weight:800;color:'+(gmd===gmt?"var(--ok)":"var(--sb)")+';font-family:var(--fM)">'+gmd+'/'+gmt+'m</span></div>'});
+h+='</div></div></div>';
+
+// Groups with background images
+d.g.forEach(function(g,gi){var gk=di+"-"+gi,io=exp[gk]!==false,tg=TG[g.tg]||TG.Study;var gd=g.st.filter(function(_,si){return!!S.c[sk(di,gi,si)]}).length,gt=g.st.length,ad=gd===gt;var gdA=gDA(di,gi),bks=dBk(g.rf),gimg=gurl(g.tg,g.ti);
+h+='<div class="grp G'+(ad?" gd":"")+'" style="border-left:4px solid '+(ad?"var(--ok)":tg.bc)+';background:linear-gradient(135deg,'+tg.bg+'22,transparent)">';
+h+='<div class="gh" onclick="exp[\''+gk+'\']=exp[\''+gk+'\']===false?true:false;R()">';
+if(gimg)h+='<div class="gh-bg" style="background-image:url(\''+gimg+'\')"></div>';
+h+='<div class="g-ico" style="background:'+tg.bg+';color:'+tg.c+'">'+tg.e+'</div>';
+h+='<div class="g-info"><div><span class="g-tag" style="background:'+tg.bg+';color:'+tg.c+'">'+g.tg+'</span><span class="g-ti">'+g.ti+'</span></div>';
+if(g.rf)h+='<div class="g-ref">📖 '+g.rf+'</div>';
+if(bks.length){h+='<div class="g-brow">';bks.forEach(function(b){h+='<span class="bb" style="background:'+BK[b].bg+';color:'+BK[b].c+'">'+BK[b].n+'</span>'});h+='</div>'}
+if(gdA)h+='<div class="g-ts">✅ '+fmt(gdA)+'</div>';
+h+='</div><span class="g-cnt" style="color:'+(ad?"var(--ok)":"var(--sb)")+'">'+gd+'/'+gt+'</span><span class="g-arr'+(io?" op":"")+'">▼</span></div>';
+if(io){h+='<div class="g-body">';if(g.nt)h+='<div class="g-note" style="background:rgba(133,79,11,.1);color:#fbbf24">💡 '+g.nt+'</div>';
+g.st.forEach(function(s,si){var k=sk(di,gi,si),dn=S.c[k];h+='<div class="stp" onclick="togStep(\''+k+'\')"><div class="cb'+(dn?" ck":"")+'"></div><div style="flex:1"><span class="stx'+(dn?" sd":"")+'">'+s.t+'</span>'+(dn?'<div class="sts">✅ '+fmt(dn)+'</div>':'')+'</div><span class="stm">'+s.m+'m</span></div>'});h+='</div>'}h+='</div>'});
+}
+
+if(view==="all"){
+h+='<input class="si" placeholder="🔍 Search..." value="'+(search||"")+'" oninput="search=this.value;R()">';
+var q=(search||"").toLowerCase();
+for(var w=0;w<7;w++){var wd=D.map(function(_,i){return i}).filter(function(i){return WFD[i]===w});var fd=q?wd.filter(function(i){var d=D[i];return d.t.toLowerCase().indexOf(q)>=0||d.s.toLowerCase().indexOf(q)>=0||d.g.some(function(g){return g.ti.toLowerCase().indexOf(q)>=0})}):wd;if(!fd.length)continue;
+h+='<div style="margin-bottom:16px"><div class="wh"><span class="wbd" style="background:'+WBG[w]+';color:'+WCR[w]+'">Week '+(w+1)+'</span><span style="font-size:11px;color:var(--sb);font-family:var(--fM)">'+wd.filter(function(i){return did(i)}).length+'/'+wd.length+'</span></div>';
+fd.forEach(function(i){var d=D[i],p=dpct(i);
+h+='<div class="dr G'+(p===100?" dd":"")+'" style="border-left:4px solid '+(p===100?"var(--ok)":WCR[w])+'" onclick="setDay('+i+');view=\'today\';R()"><div class="dr-bg" style="background-image:url(\''+hurl(i+1)+'\')"></div><div class="dnum" style="background:'+(p===100?"rgba(16,185,129,.12)":WBG[w])+';color:'+(p===100?"var(--ok)":WCR[w])+'">'+(p===100?"✓":i+1)+'</div><div style="flex:1;min-width:0;position:relative;z-index:1"><div class="dti">'+d.t+'</div><div class="dsu" style="font-size:10px;color:var(--sb);font-style:italic">'+d.s+'</div></div><span style="font-size:12px;font-weight:800;color:'+(p===100?"var(--ok)":"var(--sb)")+';font-family:var(--fM);position:relative;z-index:1">'+p+'%</span></div>'});h+='</div>'}}
+
+if(view==="stats"){
+h+='<div class="sg">';
+[{v:op+"%",l:"Overall",c:"#3b82f6"},{v:dc,l:"Days Done",c:"#10b981"},{v:td+"/"+ts,l:"Steps",c:"#8b5cf6"},{v:"🔥"+sk2,l:"Streak",c:"#f59e0b"}].forEach(function(s){h+='<div class="sc G" style="border-left-color:'+s.c+';color:'+s.c+'"><div class="sl">'+s.l+'</div><div class="sv">'+s.v+'</div></div>'});
+h+='</div><h3 style="font-size:13px;font-weight:800;margin-bottom:8px;font-family:var(--fH)">📊 Weekly Progress</h3>';
+for(var w=0;w<7;w++){var wd=D.map(function(_,i){return i}).filter(function(i){return WFD[i]===w});var wt=wd.reduce(function(a,i){return a+dst(i)},0),wdn=wd.reduce(function(a,i){return a+dsd(i)},0),wp=wt?Math.round(wdn/wt*100):0;
+h+='<div class="wr"><span class="wl" style="color:'+WCR[w]+'">Wk '+(w+1)+'</span><div class="wt"><div class="wf" style="width:'+wp+'%;background:'+WCR[w]+'"></div></div><span class="wp">'+wp+'%</span></div>'}
+h+='<div class="pnl G" style="border-color:'+(syncError?"#ef4444":"#60a5fa")+'"><div style="font-size:12px;font-weight:800;color:'+(syncError?"#ef4444":"#2563eb")+';margin-bottom:6px">📡 Multi-Device Sync</div><div style="font-size:11px;color:var(--sb);line-height:1.8"><span class="sdot '+(connected?"on":"off")+'"></span> '+(connected?"Connected — syncs instantly":syncError?"⚠️ Error: "+syncError:"Connecting...")+'<br>Sync Code: <strong style="font-family:var(--fM);letter-spacing:2px;color:var(--tx)">'+syncCode+'</strong><br>Firebase Path: <code style="font-size:9px;color:var(--sb)">'+SYNC_KEY+'</code><br>DB: <code style="font-size:9px;color:'+(db?"var(--ok)":"#ef4444")+'">'+(db?"Connected":"NOT LOADED")+'</code><br><button onclick="copyLink()" style="margin-top:6px;padding:6px 14px;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;border:none;cursor:pointer">📋 Copy Link for Other Devices</button><br><span style="font-size:9px;opacity:.7;margin-top:4px;display:block">Open same URL on any device to sync. If red: go to Firebase Console → Realtime Database → Rules → set to open.</span>'+(lastSync?'<br>Last sync: <strong style="font-family:var(--fM)">'+fmt(lastSync.toISOString())+'</strong>':'')+'</div></div>';
+h+='<div class="pnl G" style="border-color:var(--bd)"><div style="font-size:12px;font-weight:800;margin-bottom:6px">📱 Install as App</div><div style="font-size:11px;color:var(--sb);line-height:1.6"><b>Android:</b> Chrome → ⋮ → Add to Home Screen<br><b>PC:</b> Chrome → ⊕ Install<br><b>iPhone:</b> Safari → Share → Add to Home Screen</div></div>';
+h+='<div class="dz"><div style="font-size:12px;font-weight:800;color:var(--no);margin-bottom:5px">⚠️ Reset</div><button style="padding:7px 14px;border-radius:8px;border:1.5px solid var(--no);color:var(--no);font-weight:800;font-size:11px" onclick="if(confirm(\'Reset ALL progress?\')){S.c={};S.d=0;push();R()}">Reset All</button></div>'}
+
+h+='</div></div>';
+if(toastData)h+='<div class="toast" style="background:'+toastData.bg+'">'+toastData.m+'</div>';
+h+='</div>';
+app.innerHTML=h}
+
+window.togStep=togStep;window.setDay=setDay;window.toast=toast;window.R=R;window.S=S;window.copyLink=copyLink;
+loadLocal(); // Load saved data instantly
+startSync(); // Then connect Firebase in background
+R(); // Render immediately
+if("serviceWorker"in navigator){var sw='self.addEventListener("install",function(e){self.skipWaiting()});self.addEventListener("activate",function(e){self.clients.claim()});self.addEventListener("fetch",function(e){e.respondWith(fetch(e.request).catch(function(){return new Response("Offline",{status:503})}))})';navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(function(){})}
+</script>
+</body>
+</html>
